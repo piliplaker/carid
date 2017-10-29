@@ -88,8 +88,8 @@ if __name__ == '__main__':
     s = shower()
 
     g = gray(pick_color(target,'carid_blue'))
-    fg = filt(g, 90)
-    tfg = threshold(fg,20)
+    fg = filt(g, 10)
+    tfg = threshold(fg,15)
 
 
     s.add_img(g,'g')
@@ -98,15 +98,16 @@ if __name__ == '__main__':
 
     frame = get_outer_frame(tfg)
     poles = get_pole_point(frame)
-    
-    side_top=pplength(poles['left'],poles['top'])
-    side_bot=pplength(poles['bot'],poles['right'])
-    side_left=pplength(poles['left'],poles['bot'])
-    side_right=pplength(poles['top'],poles['right'])
 
-    closety=sqrt(pow(side_top-side_bot,2)+pow(side_left-side_right,2))/target.shape[0]
-    
-    if closety> 0.15:
+    rows,cols = target.shape[:2]
+    [vx,vy,x,y] = cv2.fitLine(frame, cv2.cv.CV_DIST_L2,0,0.01,0.01)
+    lefty = int((-x*vy/vx) + y)
+    righty = int(((cols-x)*vy/vx)+y)
+    line_target=target.copy()
+    cv2.line(line_target,(cols-1,righty),(0,lefty),(0,255,0),2)
+    s.add_img(line_target)
+    mytan=abs(float(righty-lefty)/(cols-1))
+    if mytan < 0.75:
         s.clear_imgs()
         (h,w) = target.shape[:2]
         center = (w / 2,h / 2)
@@ -118,8 +119,8 @@ if __name__ == '__main__':
         s.add_img(target)
 
         g = gray(pick_color(target,'carid_blue'))
-        fg = filt(g, 90)
-        tfg = threshold(fg,20)
+        fg = filt(g, 8)
+        tfg = threshold(fg,15)
 
 
         s.add_img(g,'g')
@@ -144,17 +145,27 @@ if __name__ == '__main__':
     std = perspective(target, poles2, 440,140)
     s.add_img(std, 'std')
 
+
         
     s.show()
     s.clear_imgs()
     g=gray(std)
-    tg=threshold(g,170)
-    ftg=filt(tg,10)
-    tftg=threshold(ftg,130)
+    tg=threshold(g,180)
+    ftg=filt(tg,12)
+    tftg=threshold(ftg,100)
     s.add_img(tftg)
     s.show()
 
 """
+
+
+
+    side_top=pplength(poles['left'],poles['top'])
+    side_bot=pplength(poles['bot'],poles['right'])
+    side_left=pplength(poles['left'],poles['bot'])
+    side_right=pplength(poles['top'],poles['right'])
+
+    closety=sqrt(pow(side_top-side_bot,2)+pow(side_left-side_right,2))/pplength(target.shape[:2],(0,0))
 
         id_long=poles['right'][0]-poles['left'][0]
         id_wide=poles['bot'][1]-poles['top'][1]

@@ -100,7 +100,7 @@ def pick_color(_img, color_name):
         myrange=20
     if color_name == 'carid_blue':
         color_bgr = [192, 75, 5]
-        myrange=20
+        myrange=25
     if color_name == 'carid_white':
         color_bgr = [205, 205, 205]
         myrange=20
@@ -114,7 +114,7 @@ def pick_color(_img, color_name):
     _range=myrange
     if hsv_object_color[0][0][0]< myrange:
         _range = hsv_object_color[0][0][0]
-    lower = np.array([hsv_object_color[0][0][0] - _range, 190, 170])
+    lower = np.array([hsv_object_color[0][0][0] - _range, 180, 160])
     _range=myrange
     if hsv_object_color[0][0][0]+myrange>255:
         _range = 255-hsv_object_color[0][0][0]
