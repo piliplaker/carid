@@ -41,7 +41,7 @@ def draw_grid(_img, side):
 def draw_point(_img, points):
     this_img = _img.copy()
     for _p in points:
-        cv2.circle(this_img, _p, _img.shape[0] / 70, (120, 0, 255), -1)
+        cv2.circle(this_img, _p, _img.shape[0] / 350, (120, 0, 255), -1)
         logger.info("draw a point at " + str(_p))
     return this_img
 
@@ -99,8 +99,8 @@ def pick_color(_img, color_name):
         color_bgr = [255, 255, 0]
         myrange=20
     if color_name == 'carid_blue':
-        color_bgr = [192, 75, 5]
-        myrange=25
+        color_bgr = [133, 66, 5]
+        myrange=6
     if color_name == 'carid_white':
         color_bgr = [205, 205, 205]
         myrange=20
@@ -114,7 +114,7 @@ def pick_color(_img, color_name):
     _range=myrange
     if hsv_object_color[0][0][0]< myrange:
         _range = hsv_object_color[0][0][0]
-    lower = np.array([hsv_object_color[0][0][0] - _range, 180, 160])
+    lower = np.array([hsv_object_color[0][0][0] - _range, 215, 29])
     _range=myrange
     if hsv_object_color[0][0][0]+myrange>255:
         _range = 255-hsv_object_color[0][0][0]
@@ -133,6 +133,13 @@ def erode(_img, size):
 if __name__ == '__main__':
     from shower import shower
     import res
+
+    def pick_show(color_bgr):
+        object_color = np.uint8([[color_bgr]])
+        hsv_object_color = cv2.cvtColor(object_color, cv2.COLOR_BGR2HSV)
+
+        return hsv_object_color 
+
 
     show = shower()
 
@@ -154,3 +161,13 @@ if __name__ == '__main__':
     show.add_img(erode(gray(res.xie), 10))
 
     show.show()
+    show.clear_imgs()
+
+    show.add_img(res.one, 'one')
+    show.add_img(res.two, 'two')
+    show.add_img(res.three, 'three')
+    show.add_img(res.four, 'four')
+    show.add_img(res.five, 'five')
+    show.show()
+
+    

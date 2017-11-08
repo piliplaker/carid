@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*
 import numpy as np
 import cv2
@@ -82,10 +83,19 @@ if __name__ == '__main__':
     import res
     import sys
 
-    target = cv2.imread(sys.argv[1],cv2.IMREAD_COLOR)
-    #target=res.xie
+    if len(sys.argv)!=1:
+        target = cv2.imread(sys.argv[1],cv2.IMREAD_COLOR)
+    else:
+        target=res.xie
 
     s = shower()
+
+    res_target=target.copy()
+    shrink = cv2.resize(res_target, (600,450), interpolation=cv2.INTER_CUBIC)
+    s.add_img(shrink,'shrink')
+
+    target=shrink
+    #轮廓分析
 
     g = gray(pick_color(target,'carid_blue'))
     fg = filt(g, 10)
@@ -99,6 +109,12 @@ if __name__ == '__main__':
     frame = get_outer_frame(tfg)
     poles = get_pole_point(frame)
 
+    cv2.drawContours(target, frame, cv2.CHAIN_APPROX_SIMPLE, (0,255,0), 9)
+
+    s.add_img(target,'draw')
+
+    #车牌方向分析
+
     rows,cols = target.shape[:2]
     [vx,vy,x,y] = cv2.fitLine(frame, cv2.cv.CV_DIST_L2,0,0.01,0.01)
     lefty = int((-x*vy/vx) + y)
@@ -107,7 +123,9 @@ if __name__ == '__main__':
     cv2.line(line_target,(cols-1,righty),(0,lefty),(0,255,0),2)
     s.add_img(line_target)
     mytan=abs(float(righty-lefty)/(cols-1))
+
     if mytan < 0.75:
+        s.show()
         s.clear_imgs()
         (h,w) = target.shape[:2]
         center = (w / 2,h / 2)
@@ -115,6 +133,8 @@ if __name__ == '__main__':
         #旋转45度，缩放0.75
         _M = cv2.getRotationMatrix2D(center,45,0.65)#旋转缩放矩阵：(旋转中心，旋转角度，缩放因子)
         target = cv2.warpAffine(target,_M,(w,h))
+
+        #重新进行轮廓分析
 
         s.add_img(target)
 
@@ -136,24 +156,98 @@ if __name__ == '__main__':
             [poles['top'], poles['right'], poles['left'], poles['bot']]),
         'draw_poels')
 
+    #让图像翻转成正常样子
+
     poles2={}
     poles2['right'] = poles['top']
     poles2['top'] = poles['left']
     poles2['left'] = poles['bot']
     poles2['bot'] = poles['right']
 
-    std = perspective(target, poles2, 440,140)
+    std = perspective(target, poles2, 220,70)
     s.add_img(std, 'std')
 
 
         
     s.show()
     s.clear_imgs()
+
+    #彩色车牌图像识别
+
     g=gray(std)
-    tg=threshold(g,180)
-    ftg=filt(tg,12)
+    fg=filt(g,4)
+    tg=threshold(g,175)
+    ftg=filt(tg,4)
     tftg=threshold(ftg,100)
-    s.add_img(tftg)
+
+    s.add_img(g,'g')
+    s.add_img(fg,'ft')
+    s.add_img(tg,'tg')
+    s.add_img(ftg,'ftg')
+    s.add_img(tftg,'tftg')
+    s.add_img(tftg[20:50,64:76],'point')
+    s.show()
+    s.clear_imgs()
+
+    """
+    _c = get_outer_frame(tftg[20:50,64:76])
+    _M = cv2.moments(_c)
+    cX = int(_M["m10"] / _M["m00"])
+    cY = int(_M["m01"] / _M["m00"])
+    Pcenter= (cX, cY)
+    Xoffset=cX-6
+    Yoffset=int((35-cY)/4.5)
+    """
+
+    def up_limit(num,limit):
+        if num>limit:
+            return limit
+        else: 
+            return num
+
+    def low_limit(num,limit):
+        if num<limit:
+            return limit
+        else: 
+            return num
+
+    def cal_diff(hu1,hu2):
+        return np.linalg.norm(hu1-hu2)
+
+    Xoffset=0
+    Yoffset=0
+    if Xoffset <0:
+        Xoffset=Xoffset-1
+    if Xoffset >0:
+        Xoffset=Xoffset+1
+
+    first_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),0:34+Xoffset]
+    second_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),34+Xoffset:64+Xoffset]
+    third_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),76+Xoffset:106+Xoffset]
+    forth_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),106+Xoffset:135+Xoffset]
+    fifth_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),135+Xoffset:164+Xoffset]
+    sixth_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),164+Xoffset:193+Xoffset]
+    seventh_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),193+Xoffset:]
+
+
+    img_string=[first_word_img,second_word_img,third_word_img,forth_word_img,fifth_word_img,sixth_word_img,seventh_word_img]
+    hu_string=[]
+    for _img in img_string:
+       hu_string.append(np.log10(np.abs(cv2.HuMoments(cv2.moments(_img),True).flatten()))) 
+
+
+    s.add_img(first_word_img,'1')
+    s.add_img(second_word_img,'2')
+    s.add_img(third_word_img,'3')
+    s.add_img(forth_word_img,'4')
+    s.add_img(fifth_word_img,'5')
+    s.add_img(sixth_word_img,'6')
+    s.add_img(seventh_word_img,'7')
+#    s.add_img(tftg[20:50,62:78],'2')
+
+
+
+
     s.show()
 
 """
