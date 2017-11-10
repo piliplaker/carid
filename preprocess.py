@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 import numpy as np
+import os
 import cv2
 from matplotlib import pyplot as plt
 import logconfig
 import logging
+from guess import guess
 from shower import shower
 from logconfig import timelog
 from tools import *
@@ -82,6 +84,9 @@ def pplength((x1,y1),(x2,y2)):
 if __name__ == '__main__':
     import res
     import sys
+
+    char_list=os.listdir('./charSamples')
+    char_list.sort()
 
     if len(sys.argv)!=1:
         target = cv2.imread(sys.argv[1],cv2.IMREAD_COLOR)
@@ -176,7 +181,7 @@ if __name__ == '__main__':
 
     g=gray(std)
     fg=filt(g,4)
-    tg=threshold(g,175)
+    tg=threshold(g,165)
     ftg=filt(tg,4)
     tftg=threshold(ftg,100)
 
@@ -221,13 +226,13 @@ if __name__ == '__main__':
     if Xoffset >0:
         Xoffset=Xoffset+1
 
-    first_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),0:34+Xoffset]
-    second_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),34+Xoffset:64+Xoffset]
-    third_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),76+Xoffset:106+Xoffset]
-    forth_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),106+Xoffset:135+Xoffset]
-    fifth_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),135+Xoffset:164+Xoffset]
-    sixth_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),164+Xoffset:193+Xoffset]
-    seventh_word_img=fg[low_limit(6+Yoffset,0):up_limit(64+Yoffset,70),193+Xoffset:]
+    first_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),0:34+Xoffset]
+    second_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),34+Xoffset:64+Xoffset]
+    third_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),76+Xoffset:106+Xoffset]
+    forth_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),106+Xoffset:135+Xoffset]
+    fifth_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),135+Xoffset:164+Xoffset]
+    sixth_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),164+Xoffset:193+Xoffset]
+    seventh_word_img=ftg[low_limit(4+Yoffset,0):up_limit(64+Yoffset,70),193+Xoffset:]
 
 
     img_string=[first_word_img,second_word_img,third_word_img,forth_word_img,fifth_word_img,sixth_word_img,seventh_word_img]
@@ -250,6 +255,14 @@ if __name__ == '__main__':
 
     s.show()
 
+
+    print(char_list[guess(first_word_img)[0]])
+    print(char_list[guess(second_word_img)[0]])
+    print(char_list[guess(third_word_img)[0]])
+    print(char_list[guess(forth_word_img)[0]])
+    print(char_list[guess(fifth_word_img)[0]])
+    print(char_list[guess(sixth_word_img)[0]])
+    print(char_list[guess(seventh_word_img)[0]])
 """
 
 
