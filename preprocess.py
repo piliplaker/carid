@@ -189,15 +189,15 @@ if __name__ == '__main__':
     s.show()
     s.clear_imgs()
 
-    """
-    _c = get_outer_frame(tftg[20:50,64:76])
+    
+    _c = get_outer_frame(tftg[20:50,64:80])
     _M = cv2.moments(_c)
     cX = int(_M["m10"] / _M["m00"])
     cY = int(_M["m01"] / _M["m00"])
     Pcenter= (cX, cY)
     Xoffset=cX-6
     Yoffset=int((35-cY)/4.5)
-    """
+    
 
     def up_limit(num,limit):
         if num>limit:
@@ -214,8 +214,8 @@ if __name__ == '__main__':
     def cal_diff(hu1,hu2):
         return np.linalg.norm(hu1-hu2)
 
-    Xoffset=0
-    Yoffset=0
+    #Xoffset=0
+    #Yoffset=0
     if Xoffset <0:
         Xoffset=Xoffset-1
     if Xoffset >0:
