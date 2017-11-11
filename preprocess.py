@@ -91,7 +91,7 @@ if __name__ == '__main__':
     if len(sys.argv)!=1:
         target = cv2.imread(sys.argv[1],cv2.IMREAD_COLOR)
     else:
-        target=res.xie
+        target= cv2.imread('./carid_pic/ganF6255_2.jpg',cv2.IMREAD_COLOR)
 
     s = shower()
 

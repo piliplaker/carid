@@ -100,7 +100,7 @@ def pick_color(_img, color_name):
         myrange=20
     if color_name == 'carid_blue':
         color_bgr = [133, 66, 5]
-        myrange=6
+        myrange=19
     if color_name == 'carid_white':
         color_bgr = [205, 205, 205]
         myrange=30

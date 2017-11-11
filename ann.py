@@ -45,10 +45,10 @@ test2_data[0]=input_matrix[100] #0
 test3_data=np.zeros((1,48))
 test3_data[0]=input_matrix[150] #0
 
-params = dict( term_crit = ( cv2.TERM_CRITERIA_COUNT|cv2.TERM_CRITERIA_EPS, 100000, 0.0001),  
+params = dict( term_crit = ( cv2.TERM_CRITERIA_COUNT|cv2.TERM_CRITERIA_EPS, 100000, 0.00001),  
 	       train_method = cv2.ANN_MLP_TRAIN_PARAMS_BACKPROP,   
-	       bp_dw_scale = 0.00002,  
-	       bp_moment_scale = 0.00002 )  
+	       bp_dw_scale = 0.000002,  
+	       bp_moment_scale = 0.000002 )  
 
 #ann.setTrainMethod(cv2.ml.ANN_MLP_BACKPROP)  
 #ann.setBackpropWeightScale(0.1)  
